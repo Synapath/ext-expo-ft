@@ -41,7 +41,7 @@ git clone https://github.com/pd-perry/droid.git client/droid
 ```
 
 
-**Real-Time EXPO-FT**: [modified OpenPI](https://github.com/pd-perry/openpi/tree/real-time-expo-ft) and [DROID fork](https://github.com/pd-perry/droid/tree/real-time-expo-ft), both on their `real-time-expo-ft` branches. 
+**Real-Time EXPO-FT**: [modified OpenPI](https://github.com/pd-perry/openpi/tree/real-time-expo-ft) on the `real-time-expo-ft` branch and a [DROID fork](https://github.com/pd-perry/droid). 
 
 ```bash
 # From the repo root.
