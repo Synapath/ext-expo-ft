@@ -178,17 +178,24 @@ class EpisodeSink:
     def record_transition(self, step, transition):
         self._transitions.append((step, transition))
 
+    def label_last(self, reward, mask, done):
+        if self._transitions:
+            self._transitions[-1][1].update(rewards=reward, masks=mask, dones=done)
+
     def record_log(self, step, metrics):
         self._logs.append((step, metrics))
 
     def flush_transitions(self):
         """Insert queued transitions into the replay buffer (call before any update)."""
+        # Keep the newest transition queued until it is terminal: the next step may still relabel it.
+        held = self._transitions[-1:] if self._transitions and not self._transitions[-1][1].get("dones") else []
+        ready = self._transitions[:len(self._transitions) - len(held)]
         with self.buffer_lock:
-            for _, transition in self._transitions:
+            for _, transition in ready:
                 self.batch_processor.insert_transition(transition)
         if self.save_buffer:
-            self._disk_saves.extend(self._transitions)
-        self._transitions.clear()
+            self._disk_saves.extend(ready)
+        self._transitions = held
 
     def flush_episode(self, step, agent):
         self.flush_transitions()

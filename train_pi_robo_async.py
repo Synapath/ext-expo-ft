@@ -418,6 +418,7 @@ def main(_):
         sampler.observe(observation)
         with timer.context("info"):
             done, success, reward, mask = env.get_info_for_step()
+        sink.label_last(reward, mask, done)  # outcome of the previous action
 
         # Start the next chunk's inference once exactly `delay` actions remain in the plan.
         sampler.launch(_actor_agent, observation, len(action_plan), action_type)
@@ -463,13 +464,10 @@ def main(_):
             action_plan.clear()
             sampler.on_human_takeover()
 
-        if has_action or action_type == "human":
+        if (has_action or action_type == "human") and not done:
             transition = dict(
                 observations=observation,
                 actions=real_action,
-                rewards=reward,
-                masks=mask,
-                dones=done,
                 is_hil=(action_type == "human"),
             )
             # Queued only; the buffer insert happens at episode end.
